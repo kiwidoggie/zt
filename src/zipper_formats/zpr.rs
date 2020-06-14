@@ -1,9 +1,9 @@
 mod zrp {
-    pub struct ZrpHeader {
+    pub struct ZprHeader {
 
     }
 
-    impl ZrpHeader {
+    impl ZprHeader {
         fn parse(_options: &tool_options::Options) {
 
         }
