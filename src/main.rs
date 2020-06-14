@@ -1,9 +1,12 @@
 use std::path::{Path};
 
-mod zipper_tool;
-use zipper_formats::zrb;
-
 extern crate binary_reader;
+
+mod tool_options;
+mod zipper_formats;
+
+pub use self::tool_options::{Options};
+pub use self::zipper_formats::zrb::{ZrbHeader, ZRB_FOOTER};
 
 fn main() {
     // We use clap here in order to create the output
@@ -43,7 +46,7 @@ fn main() {
     let quiet = argument_matches.value_of("quiet").unwrap_or("false").parse::<bool>().unwrap();
 
     // Create the options structure that will be passed around
-    let options = zipper_tool::Options {
+    let options = tool_options::Options {
         input_file: String::from(input_file_path.unwrap()),
         output_directory: String::from(output_directory_path),
         quiet: quiet
@@ -59,18 +62,43 @@ fn main() {
     parse_input_file(&options);
 }
 
-fn handle_zrb(_options: &zipper_tool::Options) {
-    let mut _header = ZrbHeader {
-        unknown00: 0
-    };
+/// Parses the file name and calls a extension handler if found
+/// 
+/// # Arguments
+/// 
+/// * `options` - A tool options configuration used for getting the input file path.
+fn parse_input_file(options: &tool_options::Options) {
+    let file_path = Path::new(&options.input_file);
+    if !file_path.exists() {
+        eprintln!("err: file ({}) does not exist.", options.input_file);
+        return;
+    }
 
-    _header.parse(_options);
+    // We will load based on the file extension
+    // TODO: Is there a better way than unwrap unwrap?
+    let file_extension = file_path.extension().unwrap().to_str().unwrap();
+    match &file_extension[..] {
+        "zrb" => handle_zrb(options),
+        _ => eprintln!("err: unknown file extension ({}).", file_extension)
+    };
 }
 
-fn parse_input_file(options: &zipper_tool::Options) {
-    //let file_path = Path::new(&options.input_file);
-    //let file_extension = file_path.extension();
+/// Opens up the provided zrb file for reading
+/// 
+/// # Arguments
+/// 
+/// * `_options` - A tool options configuration used for getting the input file path.
+fn handle_zrb(_options: &tool_options::Options) {
+    // Open up the file for reading
+    let mut zrb_file = match std::fs::File::open(&_options.input_file) {
+        Err(why) => panic!("could not open file {} for reading {}.", _options.input_file, why),
+        Ok(file) => file
+    };
 
-    // TODO: Figure out what the fuck
-    handle_zrb(options);
+    let mut zrb_reader = binary_reader::BinaryReader::from_file(&mut zrb_file);
+
+    let zrb_header = zipper_formats::zrb::ZrbHeader::from_reader(&mut zrb_reader);
+
+    println!("header: ");
+    println!("unknown00: {}", zrb_header.unknown00);
 }
