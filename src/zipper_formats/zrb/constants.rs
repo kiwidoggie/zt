@@ -1,1 +1,0 @@
-pub const ZRB_FOOTER: u32 = 0xDEADBEEF;

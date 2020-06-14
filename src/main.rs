@@ -1,6 +1,7 @@
 use std::path::{Path};
 
 mod zipper_tool;
+use zipper_formats::zrb;
 
 extern crate binary_reader;
 
@@ -58,7 +59,7 @@ fn main() {
     parse_input_file(&options);
 }
 
-fn handle_zrb(_options: &Options) {
+fn handle_zrb(_options: &zipper_tool::Options) {
     let mut _header = ZrbHeader {
         unknown00: 0
     };
@@ -66,7 +67,7 @@ fn handle_zrb(_options: &Options) {
     _header.parse(_options);
 }
 
-fn parse_input_file(options: &Options) {
+fn parse_input_file(options: &zipper_tool::Options) {
     //let file_path = Path::new(&options.input_file);
     //let file_extension = file_path.extension();
 

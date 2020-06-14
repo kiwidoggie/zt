@@ -10,3 +10,4 @@ pub struct Options {
     // Disable logging
     pub quiet: bool,
 }
+
