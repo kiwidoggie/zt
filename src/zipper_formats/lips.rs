@@ -74,7 +74,7 @@ impl Lips {
 
         return Lips {
             string_count: string_count,
-            strings: Vec::new(),
+            strings: Vec::new(), // TODO: figure out how to vector
             entries: entries
         };
     }

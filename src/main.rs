@@ -83,6 +83,7 @@ fn parse_input_file(options: &tool_options::Options) {
         "zrb" => handle_zrb(options),
         "clv" => handle_clv(options),
         "lips" => handle_lips(options),
+        "bon" => handle_bon(options),
         _ => eprintln!("err: unknown file extension ({}).", file_extension)
     };
 }
@@ -128,4 +129,8 @@ fn handle_lips(options: &tool_options::Options) {
     println!("lips string count: ({}).", lip.string_count);
 
     println!("lips entry count: ({}).", lip.entries.len());
+}
+
+fn handle_bon(_options: &tool_options::Options) {
+    panic!("bone support not implemented.");
 }
