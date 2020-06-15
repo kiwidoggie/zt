@@ -7,6 +7,8 @@ mod zipper_formats;
 
 pub use self::tool_options::{Options};
 pub use self::zipper_formats::zrb::{ZrbHeader, ZRB_FOOTER};
+pub use self::zipper_formats::clv::{ClvHeader, ClvEntry};
+pub use self::zipper_formats::lips::{Lips, LipsEntry};
 
 fn main() {
     // We use clap here in order to create the output
@@ -79,6 +81,8 @@ fn parse_input_file(options: &tool_options::Options) {
     let file_extension = file_path.extension().unwrap().to_str().unwrap();
     match &file_extension[..] {
         "zrb" => handle_zrb(options),
+        "clv" => handle_clv(options),
+        "lips" => handle_lips(options),
         _ => eprintln!("err: unknown file extension ({}).", file_extension)
     };
 }
@@ -101,4 +105,27 @@ fn handle_zrb(_options: &tool_options::Options) {
 
     println!("header: ");
     println!("unknown00: {}", zrb_header.unknown00);
+}
+
+fn handle_clv(options: &tool_options::Options) {
+    // Open up the file for reading
+    let mut clv_file = match std::fs::File::open(&options.input_file) {
+        Err(why) => panic!("could not open file {} for reading {}.", options.input_file, why),
+        Ok(file) => file
+    };
+
+    let mut clv_reader = binary_reader::BinaryReader::from_file(&mut clv_file);
+
+    let clv_header = zipper_formats::clv::ClvHeader::from_reader(&mut clv_reader);
+
+    println!("header: ");
+    println!("magic: {}", clv_header.magic);
+}
+
+fn handle_lips(options: &tool_options::Options) {
+    let lip = Lips::from_file(&options.input_file);
+
+    println!("lips string count: ({}).", lip.string_count);
+
+    println!("lips entry count: ({}).", lip.entries.len());
 }
